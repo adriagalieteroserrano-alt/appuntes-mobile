@@ -1,0 +1,752 @@
+ /* =========================================
+       1. VARIABLES Y TEMAS
+       ========================================= */
+    :root{
+        --ink:#0f172a;
+        --muted:#475569;
+        --border:#dbe3f6;
+        --brand:#3b82f6;
+        --brand-hover:#1d4ed8;
+        --accent:#22c55e;
+        --bgmask:rgba(15,23,42,0.7);
+        --danger:#ef4444;
+        --warning:#f97316;
+        
+        --bg-body: #f8fafc;
+        --bg-panel: #ffffff;
+        --bg-input: #ffffff;
+        --bg-screen: #f1f5f9; 
+        --bg-overlay: rgba(255,255,255,0.95);
+        --shadow: rgba(0,0,0,0.1);
+        --card-hover: rgba(0,0,0,0.05);
+    }
+
+    [data-theme="dark"] {
+        --ink: #f1f5f9;
+        --muted: #94a3b8;
+        --border: #334155;
+        --brand: #60a5fa; 
+        --brand-hover: #3b82f6;
+        --accent: #4ade80;
+        --bgmask: rgba(0,0,0,0.85);
+        --danger: #f87171;
+        --warning: #fb923c;
+        
+        --bg-body: #0f172a;
+        --bg-panel: #1e293b;
+        --bg-input: #0f172a;
+        --bg-screen: #020617;
+        --bg-overlay: rgba(15, 23, 42, 0.95);
+        --shadow: rgba(0,0,0,0.5);
+        --card-hover: rgba(255,255,255,0.05);
+    }
+
+    /* =========================================
+       2. ESTILOS GENERALES
+       ========================================= */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial; background-color: var(--bg-body); color: var(--ink); transition: background-color 0.3s, color 0.3s;}
+    
+    .screen{min-height:100vh;display:none;flex-direction: column; align-items:center;justify-content:center;padding:28px;background-size:cover;background-position:center; background-color: var(--bg-screen);}
+    .screen.active{display:flex}
+    
+    #welcome{background:#eef url('https://images.unsplash.com/photo-1596495577886-d920f1fb7238') center/cover;}
+    [data-theme="dark"] #welcome { background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1596495577886-d920f1fb7238'); }
+
+    .title-wrap{background:var(--bg-panel);border-radius:16px;padding:24px;max-width:720px;text-align:center;box-shadow:0 10px 15px var(--shadow); border: 1px solid var(--border);}
+    
+    h1{font-size:3rem;margin:0 0 10px;}
+    .logo-app { color: var(--ink); font-weight: 800; }
+    .logo-untes { color: var(--brand); font-family: "Brush Script MT", "Comic Sans MS", cursive; font-style: italic; font-weight: normal; }
+
+    p{margin:0 0 20px; line-height: 1.5;}
+    h2, h3 { color: var(--ink); margin-top: 0; }
+
+    .btn{display:inline-block;padding:10px 20px;margin:5px;border:none;border-radius:8px;font-size:1rem;cursor:pointer;background:var(--brand);color:#fff;transition:background 0.3s}
+    .btn:hover{background:var(--brand-hover)}
+/* --- FEEDBACK TÁCTIL (Hacer que los botones reaccionen al dedo) --- */
+    .btn:active {
+        transform: scale(0.96); /* El botón se encoge un poco al pulsar */
+        box-shadow: inset 0 3px 5px rgba(0,0,0,0.2); /* Sombra interior para efecto hundido */
+        transition: transform 0.05s; /* Animación muy rápida */
+    }
+    .btn.secondary{background:var(--muted);margin-left:0; color: #fff;}
+    .btn.secondary:hover{background:var(--ink)}
+    .btn.danger{background:var(--danger); color: #fff;}
+    .btn.warning{background:var(--warning); color: #fff;}
+    .btn.success{background:var(--accent); color: #fff;}
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    
+    .btn-fav {
+        background: transparent;
+        border: 2px solid var(--danger);
+        color: var(--danger);
+        font-size: 1.5rem;
+        cursor: pointer;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        margin-left: 10px;
+    }
+    .btn-fav:hover { transform: scale(1.1); background: rgba(239, 68, 68, 0.1); }
+    .btn-fav.active { background: var(--danger); color: white; box-shadow: 0 0 10px var(--danger); }
+
+    .verified-icon { color: var(--accent); margin-left: 5px; font-size: 1.1rem; vertical-align: middle; }
+    .verification-box {
+        text-align: center; margin: 10px 0; padding: 10px; 
+        background-color: rgba(34, 197, 94, 0.1); 
+        border: 1px solid var(--accent); 
+        color: var(--accent); 
+        border-radius: 6px; font-weight: bold;
+    }
+
+    #flashcardContainer {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 15px;
+        background: var(--bg-screen);
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .card-face {
+        min-height: 100px;
+        width: 100%;
+        padding: 15px;
+        background: var(--bg-panel);
+        border-radius: 8px;
+        box-shadow: 0 4px 6px var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        transition: all 0.5s;
+        cursor: pointer;
+        user-select: none;
+        border: 2px dashed var(--brand);
+    }
+    .card-face.back {
+        border-color: var(--accent);
+        color: var(--ink);
+        background: var(--bg-panel);
+    }
+
+    #auth{background-color:var(--bg-body)}
+    .panel{display:flex;width:100%;max-width:1000px;background:var(--bg-panel);border-radius:12px;box-shadow:0 25px 50px var(--shadow);overflow:hidden;position:relative; border: 1px solid var(--border);}
+    .form-wrap{padding:40px;flex:1;min-width:300px}
+    .form-wrap h2{margin-top:0;border-bottom:2px solid var(--border);padding-bottom:10px}
+    
+    label{display:block;margin-top:10px;margin-bottom:5px;font-weight:600}
+    input[type="text"],input[type="password"],select,textarea, input[type="file"]{
+        width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;margin-bottom:15px;
+        background-color: var(--bg-input); color: var(--ink);
+    }
+    textarea{min-height:100px; font-family: inherit;}
+    .hidden{display:none!important}
+    .group{display:flex;flex-wrap:wrap;gap:10px}
+    
+    #subjects, #profile, #adminPanelScreen { background-color: var(--bg-screen); } 
+
+    #subjects .container{display:grid;grid-template-columns:1fr 2fr;gap:20px;max-width:1200px;width:100%;margin:auto}
+    #subjects h3,#subjects h3{margin-top:0}
+    #subjects .box{background:var(--bg-panel);padding:20px;border-radius:8px;box-shadow:0 4px 6px var(--shadow); border: 1px solid var(--border);}
+    #subjects .list button{display:block;width:100%;text-align:left}
+    .note-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px dotted var(--border)}
+    .note-item:last-child{border-bottom:none}
+    
+    #filterControls {
+        display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+        margin-bottom: 15px; padding: 10px; background: var(--bg-input);
+        border-radius: 6px; border: 1px solid var(--border); gap: 10px;
+    }
+    #paginationControls { display: flex; align-items: center; gap: 5px; margin-left: auto; }
+    #paginationControls button { padding: 5px 10px; margin: 0; }
+    #paginationControls span { font-weight: bold; }
+
+    #protectedModal, #structuredSearchModal, #requestNoteModal, #requestsModal, #requestEditorModal, #adminAuthModal, #teacherCourseModal, #flashcardsModal {
+        position:fixed;top:0;left:0;width:100%;height:100%;
+        background:var(--bgmask);z-index:100;display:none;padding:50px
+    }
+    #protectedModal.active, #structuredSearchModal.active, #requestNoteModal.active, #requestsModal.active, #requestEditorModal.active, #adminAuthModal.active, #teacherCourseModal.active, #flashcardsModal.active {
+        display:flex; align-items: center; justify-content: center;
+    } 
+    .modal-content{background:var(--bg-panel);border-radius:12px;padding:30px;max-width:900px;width:100%;box-shadow:0 0 25px var(--shadow);max-height:100%;overflow-y: auto; color: var(--ink);} 
+    #modalTitle{text-align:center;color:var(--brand);margin-top:0;margin-bottom:20px}
+    
+    .course-select-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--bg-overlay);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
+    .course-select-overlay h2{color:var(--brand)}
+
+    .rating-stars { display: inline-block; font-size: 2rem; cursor: pointer; user-select: none; line-height: 1; }
+/* =========================================
+       ADAPTACIÓN MÓVIL (RESPONSIVE)
+       ========================================= */
+    /* Cuando la pantalla es menor de 768px (Móviles y Tablets verticales) */
+    @media (max-width: 768px) {
+        /* 1. Las ventanas ocupan toda la pantalla para aprovechar espacio */
+        .modal-content {
+            height: 100%;       
+            max-height: 100%;   
+            border-radius: 0;   
+            padding: 15px;      
+            max-width: 100%;    
+        }
+        
+        /* 2. Botones más altos (44px) para facilitar el toque con el dedo */
+        .btn {
+            min-height: 44px;   
+            font-size: 1rem;
+            margin: 5px 0; /* Separación vertical para no pulsar dos a la vez */
+            width: 100%;   /* En móvil, los botones anchos son mejores */
+        }
+
+        /* 3. Ajuste de texto base */
+        html, body {
+            font-size: 16px; 
+        }
+
+        /* 4. Ajuste de rejilla del Dashboard a 1 sola columna */
+        #dashboard .container {
+            grid-template-columns: 1fr; 
+        }
+        
+        /* 5. Ajuste de avatares en selección */
+        .avatar-grid {
+            grid-template-columns: repeat(4, 1fr); /* Menos columnas en móvil */
+        }
+    }
+/* --- REFINAMIENTO DE INTERFAZ MÓVIL (Inputs y Espaciado) --- */
+    @media (max-width: 768px) {
+        /* 1. Truco Pro: Evita que el móvil haga zoom al escribir */
+        input[type="text"], input[type="password"], select, textarea {
+            font-size: 16px !important; 
+        }
+
+        /* 2. Aprovechar cada píxel de la pantalla */
+        .screen {
+            padding: 15px !important;    /* Reducimos margen externo */
+            justify-content: flex-start; /* Alinear contenido arriba (mejor scroll) */
+            padding-top: 60px !important;/* Espacio extra arriba para que no tape el botón de Tema */
+        }
+
+        /* 3. Títulos más compactos */
+        h1 { font-size: 2.2rem; }
+        .title-wrap { padding: 15px; margin-top: 10px; width: 100%; }
+
+        /* 4. Botón de Tema (Sol / Luna) más discreto */
+        #themeToggle {
+            top: 10px;
+            right: 10px;
+            width: 38px;
+            height: 38px;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+    }
+    .rating-stars span { color: #ccc; transition: transform 0.1s, color: 0.1s; }
+    .rating-stars span:hover { transform: scale(1.1); }
+    
+    .selection-step-container { padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; }
+    .selection-step-container p { font-weight: bold; color: var(--brand); border-bottom: 1px dotted var(--border); padding-bottom: 5px; margin-bottom: 10px; }
+    .selection-step-container .group button { width: auto; min-width: 120px; margin: 5px; }
+
+    .request-card { border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 10px; background: var(--bg-panel); transition: box-shadow 0.2s; }
+    .request-card:hover { box-shadow: 0 4px 12px var(--shadow); }
+    .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; display: inline-block; margin-bottom: 5px; }
+    
+    .status-pendiente { background: #ffedd5; color: #9a3412; }
+    .status-borrador { background: #dbeafe; color: #1e40af; }
+    .status-completada { background: #dcfce7; color: #166534; }
+    .status-rechazada { background: #fee2e2; color: #991b1b; }
+    .status-asignada { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+
+    #adminTrigger { color: #cbd5e1; font-size: 0.8rem; cursor: pointer; text-decoration: none; user-select: none; }
+    #adminTrigger:hover { color: #94a3b8; }
+
+    #adminTable { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
+    #adminTable th, #adminTable td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+    #adminTable th { background-color: var(--bg-screen); color: var(--brand); }
+    .status-active { color: var(--accent); font-weight: bold; }
+    .status-inactive { color: var(--danger); font-weight: bold; }
+    .status-missing-data { color: #991b1b; font-weight: bold; font-style: italic; }
+    .action-btn-admin { padding: 4px 8px; font-size: 0.8rem; margin: 0; }
+
+    .row-pending-review { background-color: rgba(254, 249, 195, 0.5) !important; }
+
+    .avatar-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 15px; }
+    .avatar-option { font-size: 2rem; cursor: pointer; border: 2px solid transparent; border-radius: 50%; text-align: center; background: var(--bg-screen); transition: all 0.2s; user-select: none; padding: 5px; }
+    .avatar-option:hover { transform: scale(1.1); background: var(--border); }
+    .avatar-option.selected { border-color: var(--brand); background: var(--bg-body); transform: scale(1.1); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
+    
+    .profile-avatar-large { font-size: 4rem; background: var(--bg-panel); border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; box-shadow: 0 4px 6px var(--shadow); border: 4px solid var(--brand); }
+    .user-avatar-small { font-size: 1.4rem; margin-right: 8px; vertical-align: middle; display: inline-block; background: var(--bg-screen); border-radius: 50%; width: 32px; height: 32px; text-align: center; line-height: 32px; border: 1px solid var(--border); }
+
+    #dashboard .container {
+        max-width: 900px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .dash-card {
+        background: var(--bg-panel);
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px var(--shadow);
+        border: 1px solid var(--border);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .dash-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px var(--shadow);
+    }
+
+    .dash-welcome {
+        grid-column: 1 / -1;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--brand);
+        margin: 10px 0;
+    }
+
+    .motivation-quote {
+        grid-column: 1 / -1;
+        font-style: italic;
+        color: var(--muted);
+        margin-top: 10px;
+        padding: 15px;
+        border-left: 4px solid var(--accent);
+        background: var(--bg-panel);
+        border-radius: 0 4px 4px 0;
+    }
+
+    .dash-avatar {
+        font-size: 4rem;
+        margin-bottom: 10px;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    #themeToggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 6px var(--shadow);
+    }
+    
+    #flashcardsModal .modal-content {
+        max-width: 500px;
+    }
+/* EFECTO PARPADEO PARA AVISOS URGENTES */
+@keyframes blink-alert {
+    0% { background-color: #fee2e2; border-color: #fca5a5; }
+    50% { background-color: #fff1f2; border-color: #fecdd3; }
+    100% { background-color: #fee2e2; border-color: #fca5a5; }
+}
+
+.blink-active {
+    animation: blink-alert 1.5s infinite ease-in-out;
+    border: 2px solid #ef4444 !important;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+/* =========================================
+   ESTILOS DE NOTIFICACIONES (TOAST)
+   ========================================= */
+#toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    min-width: 250px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    background: var(--brand); /* Azul por defecto */
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateX(50px);
+    animation: slideIn 0.3s forwards;
+}
+
+.toast.success { background: var(--accent); } /* Verde */
+.toast.error   { background: var(--danger); } /* Rojo */
+.toast.warning { background: var(--warning); } /* Naranja */
+
+/* Animaciones */
+@keyframes slideIn {
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOut {
+    to { opacity: 0; transform: translateX(100%); }
+}
+/* =========================================
+   ESTILOS DE GAMIFICACIÓN (LOGROS)
+   ========================================= */
+
+/* Animación de rebote para el icono */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Vitrina de Trofeos en el Perfil */
+.trophy-case {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 15px;
+    background: var(--bg-input);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 10px;
+}
+
+.badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    opacity: 0.3; 
+    filter: grayscale(100%);
+    transition: all 0.3s;
+    cursor: pointer; /* <--- AÑADIR ESTO */
+    position: relative; /* Para asegurar el posicionamiento */
+}
+
+.badge-item:hover {
+    transform: scale(1.1); /* Efecto visual al pasar el ratón */
+}
+
+.badge-item.unlocked {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: scale(1.05);
+}
+
+.badge-icon {
+    font-size: 2.5rem;
+    margin-bottom: 5px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.badge-name {
+    font-size: 0.7rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+/* Contador de progreso para medallas */
+.badge-counter {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--muted); /* Tono grisáceo (mismo tono) */
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Si la medalla está desbloqueada, escondemos el contador o lo ponemos en dorado */
+.badge-item.unlocked .badge-counter {
+    display: none; 
+}
+/* =========================================
+   NUEVO: VISTA DIVIDIDA (APUNTE + ARCHIVO)
+   ========================================= */
+.split-view-container {
+    display: flex;
+    gap: 20px;
+    height: 80vh; /* Altura fija para permitir scroll interno */
+    overflow: hidden;
+}
+
+.split-left {
+    flex: 1;
+    overflow-y: auto; /* Scroll independiente para el texto */
+    padding-right: 10px;
+}
+
+.split-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-body);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.file-viewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+    object-fit: contain; /* Para que las imágenes se ajusten bien */
+}
+
+/* En móviles, volvemos a poner uno debajo de otro */
+@media (max-width: 768px) {
+    .split-view-container {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+    }
+    .split-right {
+        height: 500px; /* Altura forzada en móvil para el visor */
+        margin-top: 20px;
+    }
+}
+
+
+/* =========================================
+   VISOR CON ZOOM DE BOTONES Y SCROLL
+   ========================================= */
+.zoom-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: auto;  /* <--- ESTO ES LO IMPORTANTE: Permite barras de scroll */
+    background: #525659; 
+    position: relative;
+    display: block; 
+}
+
+.zoom-content {
+    display: block; 
+    margin: 0 auto;
+    transform-origin: top left;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: width 0.2s ease; /* Suaviza el efecto de zoom */
+}
+/* =========================================
+   NUEVO: ANIMACIÓN DE CAMPANA (NOTIFICACIÓN)
+   ========================================= */
+@keyframes bellRing {
+    0%, 100% { transform: rotate(0); }
+    10%, 30%, 50%, 70%, 90% { transform: rotate(10deg); }
+    20%, 40%, 60%, 80% { transform: rotate(-10deg); }
+}
+
+/* --- ANIMACIÓN DE RESALTADO PARA BÚSQUEDA (MEJORADO) --- */
+@keyframes highlight-pulse {
+    0% { 
+        outline: 3px solid var(--warning); 
+        outline-offset: 2px; 
+        transform: scale(1); 
+    }
+    50% { 
+        outline: 5px solid gold; 
+        outline-offset: 4px; 
+        transform: scale(1.02); 
+        box-shadow: 0 0 15px gold;
+    }
+    100% { 
+        outline: 3px solid var(--warning); 
+        outline-offset: 2px; 
+        transform: scale(1); 
+    }
+}
+
+.highlight-topic {
+    animation: highlight-pulse 0.8s ease-in-out 3;
+    z-index: 10;
+    position: relative;
+}
+
+.notification-bell {
+    display: inline-block;
+    animation: bellRing 2s infinite;
+    margin-left: 5px;
+}
+/* --- SISTEMA DE MEDALLAS --- */
+.medal-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 10px;
+    background: var(--bg-screen);
+    border-radius: 8px;
+}
+
+.medal-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 70px;
+    text-align: center;
+    opacity: 0.3; /* Por defecto apagadas */
+    filter: grayscale(1);
+    transition: all 0.4s ease;
+}
+
+.medal-item.unlocked {
+    opacity: 1;
+    filter: grayscale(0);
+    transform: scale(1.1);
+}
+
+.medal-icon {
+    font-size: 2rem;
+    margin-bottom: 5px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.medal-name {
+    font-size: 0.65rem;
+    font-weight: bold;
+    color: var(--ink);
+    line-height: 1;
+}
+
+/* Efecto de brillo para medallas desbloqueadas */
+.medal-item.unlocked .medal-icon {
+    animation: medal-shine 2s infinite alternate;
+}
+
+@keyframes medal-shine {
+    from { filter: drop-shadow(0 0 2px gold); }
+    to { filter: drop-shadow(0 0 8px gold) scale(1.05); }
+}
+/* --- CONTENEDOR DE NOTIFICACIONES (TOASTS) --- */
+    #toast-container {
+        position: fixed;
+        bottom: 20px;           /* En móvil: Abajo */
+        left: 50%;
+        transform: translateX(-50%); /* Centrado horizontalmente */
+        z-index: 9999;
+        width: 90%;             /* Que no toque los bordes */
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .toast {
+        background: rgba(15, 23, 42, 0.95); /* Color oscuro elegante */
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 50px;    /* Muy redondeado (estilo App moderna) */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        animation: slideUp 0.3s ease-out; /* Animación de entrada */
+        backdrop-filter: blur(4px); /* Efecto cristal */
+    }
+
+    /* Animación de entrada suave desde abajo */
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* Animación de salida (usada por el JS) */
+    @keyframes slideOut {
+        to { transform: translateY(20px); opacity: 0; }
+    }
+/* --- TOQUES FINALES DE APP NATIVA (Scrollbars y Taps) --- */
+
+    /* 1. Elimina el destello azul/gris al pulsar con el dedo en móviles */
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 2. Scrollbar Estilizada (Más fina y elegante que la del navegador) */
+    /* Barra completa */
+    ::-webkit-scrollbar {
+        width: 6px;             /* Muy fina verticalmente */
+        height: 6px;            /* Muy fina horizontalmente */
+    }
+    /* El fondo de la barra (carril) */
+    ::-webkit-scrollbar-track {
+        background: transparent; /* Invisible */
+    }
+    /* El "pulgar" (la parte que se mueve) */
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;    /* Gris muy suave */
+        border-radius: 10px;    /* Redondeada como una píldora */
+    }
+    /* Al tocar la barra */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;    
+    }
+/* --- ANIMACIÓN DE CAMPANITA Y NOTIFICACIONES --- */
+
+/* La animación de temblor */
+@keyframes bellShake {
+  0% { transform: rotate(0); }
+  15% { transform: rotate(5deg); }
+  30% { transform: rotate(-5deg); }
+  45% { transform: rotate(4deg); }
+  60% { transform: rotate(-4deg); }
+  75% { transform: rotate(2deg); }
+  85% { transform: rotate(-2deg); }
+  100% { transform: rotate(0); }
+}
+
+/* Clase para activar la animación */
+.bell-ringing {
+  display: inline-block;
+  animation: bellShake 2s infinite; /* Se mueve cada 2 segundos */
+  transform-origin: top center;
+}
+
+/* El círculo rojo con el número */
+.notification-badge {
+  background-color: #ef4444; /* Rojo */
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  vertical-align: top;
+  margin-left: -5px; /* Para que se superponga un poco */
+  border: 2px solid white; /* Borde blanco para separar */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
