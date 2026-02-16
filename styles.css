@@ -750,3 +750,71 @@
   border: 2px solid white; /* Borde blanco para separar */
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
+/* =========================================
+   CORRECCIONES PARA MÓVIL (RESPONSIVE)
+   ========================================= */
+@media (max-width: 768px) {
+    
+    /* 1. Forzar que todo se ponga en columna vertical */
+    #dashboard, .main-container, .panel-body {
+        flex-direction: column !important;
+        display: flex !important;
+    }
+
+    /* 2. Que las columnas ocupen todo el ancho */
+    .sidebar, .content-area, #topicsContainer, #notesContainer {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        margin-bottom: 20px;
+    }
+
+    /* 3. Arreglar el formulario de crear apunte */
+    #createNoteForm {
+        padding-bottom: 80px; /* Espacio extra abajo para que se vea el botón */
+    }
+
+    /* 4. Asegurar que los botones no se salgan de la pantalla */
+    .group {
+        flex-direction: column; /* Botones uno debajo de otro si no caben */
+        gap: 10px;
+    }
+    
+    button {
+        width: 100%; /* Botones grandes y fáciles de tocar */
+        min-height: 45px;
+    }
+}
+/* ARREGLO FINAL BOTÓN GUARDAR MÓVIL */
+@media (max-width: 768px) {
+    #createNoteForm {
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 100px !important; /* Espacio extra vital */
+    }
+
+    #notesContainer {
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Hacer el botón de guardar GIGANTE y FLOTANTE para que no se pierda */
+    #createNoteForm .group {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 15px;
+        box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+        z-index: 9999;
+        display: flex;
+        gap: 10px;
+    }
+
+    #createNoteForm .group button {
+        flex: 1;
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+}
