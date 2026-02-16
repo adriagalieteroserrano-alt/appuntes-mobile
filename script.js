@@ -2265,39 +2265,32 @@
         const modeTitle = noteToEdit ? "✏️ Editar Apunte" : "📝 Crear Nuevo Apunte";
         notesContainer.innerHTML = `<h3>${modeTitle}</h3>`;
         
-        const form = document.createElement('form');
+      const form = document.createElement('form');
         form.id = 'createNoteForm';
         
         const initialTitle = noteToEdit ? noteToEdit.displayName : '';
         const initialText = noteToEdit ? noteToEdit.text : '';
-        
-        // --- 1. CONFIGURACIÓN DE AUDIO ---
+
+        // --- 1. CONFIGURACIÓN DE AUDIO (SOLO PROFESOR) ---
         let tempAudioBase64 = noteToEdit ? noteToEdit.audioData : null;
-        
         let recorderHTML = '';
-        // VERIFICACIÓN DE ROL: Solo el Profesor ve la grabadora
+        
         if (userRol === 'Profesor') {
             const hasAudio = !!tempAudioBase64;
-            
-            // Forzamos estilos 'flex' para asegurar que se vean los contenedores
             const displayRec = hasAudio ? 'none' : 'flex';
             const displayPlay = hasAudio ? 'flex' : 'none';
-
             recorderHTML = `
                 <label style="margin-top:15px; color:var(--brand); font-weight:bold;">🎙️ Nota de Voz (Profesor)</label>
                 <div style="background:#f0f9ff; padding:10px; border:1px solid #bae6fd; border-radius:6px; margin-bottom:15px;">
-                    
                     <div id="recordControls" style="display:${displayRec}; gap:10px; align-items:center;">
                         <button type="button" id="btnRecord" class="btn secondary" style="background:white; border:1px solid #ccc; color:#333; min-width:100px;">🔴 Grabar</button>
                         <span id="recTimer" style="font-family:monospace; font-size:1.1rem; color:#666; display:none;">00:00</span>
                         <button type="button" id="btnStop" class="btn secondary" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; display:none;">⏹️ Parar y Guardar</button>
                     </div>
-
                     <div id="playbackControls" style="display:${displayPlay}; gap:5px; align-items:center;">
                         <button type="button" id="btnPlay" class="btn success" style="flex:1;">▶️ Escuchar Grabación</button>
                         <button type="button" id="btnDeleteAudio" class="btn danger" style="width:50px;" title="Borrar Audio">🗑️</button>
                     </div>
-
                     <p id="recStatus" style="font-size:0.85rem; color:#666; margin:5px 0 0 0; font-style:italic;">
                         ${hasAudio ? '✅ Audio adjunto listo.' : 'Pulsa grabar para añadir voz.'}
                     </p>
@@ -2310,52 +2303,54 @@
             fileMsg = `<p style="color:var(--accent); font-size:0.9rem; margin-bottom:5px;">✅ Archivo actual: <strong>${noteToEdit.fileName}</strong></p>`;
         }
 
+        // --- HTML DEL FORMULARIO (INCLUYE CÁMARA UNIVERSAL) ---
         form.innerHTML = `
             <label>Título (Máx. 50 caracteres)</label>
             <input type="text" id="noteName" maxlength="50" value="${initialTitle}" required />
+            
             <label>Contenido</label>
             <textarea id="noteText" style="min-height:100px;">${initialText}</textarea>
+            
             ${recorderHTML}
+            
             <label>Archivo Adjunto (PDF/IMG)</label>
             ${fileMsg}
             <input type="file" id="noteFile" accept=".pdf, .jpg, .jpeg, .png" />
-${userRol === 'Profesor' ? `
+            
             <div style="margin-top:10px; padding:10px; background:#f0f9ff; border:1px dashed #3b82f6; border-radius:6px;">
                 <label style="color:#0369a1; font-weight:bold; display:block; margin-bottom:5px;">📸 Escanear Apunte (Cámara)</label>
                 <input type="file" id="noteCamera" accept="image/*" capture="environment" class="btn" style="width:100%; background:#0f172a; color:white;">
                 <img id="noteCameraPreview" style="display:none; width:100%; margin-top:10px; border-radius:6px; border:2px solid #3b82f6;">
                 <input type="hidden" id="noteCameraBase64" value="${noteToEdit && noteToEdit.fileDataURL && noteToEdit.fileDataURL.startsWith('data:image') ? noteToEdit.fileDataURL : ''}">
-            </div>` : ''}
+            </div>
         `;
         
         notesContainer.appendChild(form);
 
-        // --- 2. LÓGICA DE LA GRABADORA ---
-       // --- 1.5 LÓGICA DE CÁMARA (NUEVO) ---
-        if (userRol === 'Profesor') {
-            const camInput = document.getElementById('noteCamera');
-            if (camInput) {
-                camInput.addEventListener('change', (e) => {
-                    const f = e.target.files[0];
-                    if (f) {
-                        const r = new FileReader();
-                        r.onload = (evt) => {
-                            document.getElementById('noteCameraBase64').value = evt.target.result;
-                            const img = document.getElementById('noteCameraPreview');
-                            img.src = evt.target.result;
-                            img.style.display = 'block';
-                            showToast("📸 Foto procesada", "success");
-                        };
-                        r.readAsDataURL(f);
-                    }
-                });
-                // Si estamos editando y ya había foto, mostrarla
-                const existing = document.getElementById('noteCameraBase64').value;
-                if(existing) {
-                    const img = document.getElementById('noteCameraPreview');
-                    img.src = existing;
-                    img.style.display = 'block';
+        // --- 2. LÓGICA DE CÁMARA (ACTIVACIÓN) ---
+        const camInput = document.getElementById('noteCamera');
+        if (camInput) {
+            camInput.onchange = (e) => {
+                const f = e.target.files[0];
+                if (f) {
+                    const r = new FileReader();
+                    r.onload = (evt) => {
+                        document.getElementById('noteCameraBase64').value = evt.target.result;
+                        const img = document.getElementById('noteCameraPreview');
+                        img.src = evt.target.result;
+                        img.style.display = 'block';
+                        showToast("📸 Foto procesada", "success");
+                    };
+                    r.readAsDataURL(f);
                 }
+            };
+            
+            // Si estamos editando y ya había foto, mostrarla
+            const existing = document.getElementById('noteCameraBase64').value;
+            if(existing && existing.length > 50) {
+                const img = document.getElementById('noteCameraPreview');
+                img.src = existing;
+                img.style.display = 'block';
             }
         }
 //================================================================================================
@@ -2516,35 +2511,12 @@ ${userRol === 'Profesor' ? `
    =================================================================================================== */
 
         // --- 4. BARRA DE HERRAMIENTAS EDITOR ---
-        const textArea = document.getElementById('noteText'); 
-        if (textArea && !document.getElementById('editorToolbar')) {
-            const toolbar = document.createElement('div');
-            toolbar.id = 'editorToolbar';
-            toolbar.style.marginBottom = '5px';
-            toolbar.style.display = 'flex';
-            toolbar.style.gap = '5px';
-
-            const insertTag = (s, e) => {
-                const start = textArea.selectionStart;
-                const end = textArea.selectionEnd;
-                const text = textArea.value;
-                textArea.value = text.substring(0, start) + s + text.substring(start, end) + e + text.substring(end);
-            };
-            const mkBtn = (lbl, s, e) => {
-                const b = document.createElement('button');
-                b.type = 'button'; b.innerHTML = lbl; b.className = 'btn secondary'; b.style.padding = '2px 10px';
-                b.onclick = () => insertTag(s, e);
-                return b;
-            };
-            toolbar.appendChild(mkBtn('<b>B</b>', '<b>', '</b>'));
-            toolbar.appendChild(mkBtn('<i>I</i>', '<i>', '</i>'));
-            textArea.parentNode.insertBefore(toolbar, textArea);
-        }
+ 
 
         // --- 5. BOTONES DE GUARDADO ---
         const actions = document.createElement('div');
         actions.className = 'group';
-        actions.style.marginTop = '20px';
+        actions.style.cssText = 'margin-top: 20px; padding-bottom: 50px; display: flex; gap: 10px;';
 
         const btnSave = document.createElement("button");
         btnSave.textContent = noteToEdit ? "💾 Guardar Cambios" : "💾 Guardar Apunte";
@@ -2649,6 +2621,7 @@ ${userRol === 'Profesor' ? `
             showTopicOptions(subject, topic);
             consultNotes(subject, topic);
         };
+actions.appendChild(btnSave);
         actions.appendChild(btnCancel);
         
         notesContainer.appendChild(actions);
@@ -2848,8 +2821,17 @@ ${userRol === 'Profesor' ? `
         // INICIO BLOQUE MODIFICADO
         // ---------------------------------------------------------------------------------------------------
         
-        let rawText = note.text || '<em style="color:#888;">(Este apunte no contiene texto, solo archivo adjunto)</em>';
+        // --- VISUALIZACIÓN DE TEXTO PLANO SEGURO ---
+        let rawText = note.text || '(Este apunte no contiene texto, solo archivo adjunto)';
         
+        const textContainer = document.createElement('div');
+        textContainer.className = 'note-text-viewer';
+        textContainer.style.cssText = "white-space: pre-wrap; word-wrap: break-word; margin-bottom: 20px; font-family: inherit; color: var(--ink);";
+        
+        // Usamos textContent para evitar errores de sintaxis y problemas de formato en móvil
+        textContainer.textContent = rawText; 
+        
+        modalContent.appendChild(textContainer);
         // 1. Detección automática de enlaces de YouTube
         const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/g;
         
